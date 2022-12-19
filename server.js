@@ -9,19 +9,21 @@ const requestListener = (request, response) => {
   const { method } = request;
 
   if (method === "GET") {
-    response.end("GET");
+    response.end('<h1>ini GET</h1>');
   }
 
   if (method === "POST") {
-    response.end('POST');
-  }
+    let body = []
 
-  if (method === "PUT") {
-    response.end('PUT');
-  }
+    request.on('data', (chunk) => {
+        body.push(chunk)
+    })
 
-  if (method === "DELETE") {
-    response.end('DELETE');
+    request.on('end', () => {
+        body = Buffer.concat(body).toString()
+        const { name } = JSON.parse(body)
+        response.end(`<h1>Halo ${name}!</h1>`)
+    })
   }
 };
 
