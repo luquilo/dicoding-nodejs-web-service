@@ -5,49 +5,55 @@ const host = "localhost";
 
 const requestListener = (request, response) => {
   response.setHeader("Content-Type", "application/json");
-  response.setHeader('X-Powered-By', 'NodeJS')
+  response.setHeader("X-Powered-By", "NodeJS");
 
   const { method, url } = request;
 
   if (url === "/") {
     if (method === "GET") {
-      response.statusCode = 200 
-      response.end("<h1>ini adalah homepage</h1>");
+      response.statusCode = 200;
+      response.end(JSON.stringify({
+        "message" : "ini adalah homepage!"
+      }))
     } else {
       response.statusCode = 400
-      response.end(`responds tidak ditemukan dengan method ${method} request`);
+      response.end(JSON.stringify({
+        "message" : `halaman tidak dapat diakses dengan method ${method} request`
+      }))
     }
     //todo logika bila url bernilai /
   } else if (url === "/about") {
-
-      if (method === "GET") {
-        response.statusCode = 200
-        response.end('<h1>ini adalah halaman about</h1>')
-      } 
-      
-      else if (method === "POST") {
-        let body = []
-        request.on('data', (chunk) => {
-          body.push(chunk)
+    if (method === "GET") {
+      response.statusCode = 200;
+      response.end(JSON.stringify({
+        "message" : "ini adalah halaman about"
+      }));
+    } else if (method === "POST") {
+      let body = [];
+      request.on("data", (chunk) => {
+        body.push(chunk);
+      });
+      request.on("end", () => {
+        body = Buffer.concat(body).toString();
+        const { name } = JSON.parse(body);
+        response.statusCode = 200;
+        response.end(JSON.stringify({
+          "message" : `halo ${name}, ini adalah halaman post!`
+        }))
+      });
+    } else {
+      response.statusCode = 400;
+      response.end(
+        JSON.stringify({
+          message: "maaf permintaan tidak diketahui"
         })
-        request.on('end', () => {
-          body = Buffer.concat(body).toString();
-          const {name} = JSON.parse(body);
-          response.statusCode = 200
-          response.end(`<h1>Halo, ${name}! Ini adalah halaman about</h1>`);
-        })
-      }
-      
-    
-      else {
-        response.statusCode = 400
-        response.end(
-          `<h1>halaman tidak dapat diakses menggunakan method ${method} request</h1>`
       );
     }
   } else {
-    response.statusCode = 400
-    response.end("<h1>halaman tidak ditemukan!</h1>");
+    response.statusCode = 400;
+    response.end(JSON.stringify({
+      "message" : "halaman tidak ditemukan!"
+    }))
   }
 
   // if (method === "GET") {
