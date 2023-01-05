@@ -4,21 +4,24 @@ const port = 5000;
 const host = "localhost";
 
 const requestListener = (request, response) => {
-  response.setHeader("Content-Type", "text/html");
-  response.statusCode = 200;
+  response.setHeader("Content-Type", "application/json");
+  response.setHeader('X-Powered-By', 'NodeJS')
 
   const { method, url } = request;
 
   if (url === "/") {
     if (method === "GET") {
+      response.statusCode = 200 
       response.end("<h1>ini adalah homepage</h1>");
     } else {
+      response.statusCode = 400
       response.end(`responds tidak ditemukan dengan method ${method} request`);
     }
     //todo logika bila url bernilai /
   } else if (url === "/about") {
 
       if (method === "GET") {
+        response.statusCode = 200
         response.end('<h1>ini adalah halaman about</h1>')
       } 
       
@@ -30,17 +33,20 @@ const requestListener = (request, response) => {
         request.on('end', () => {
           body = Buffer.concat(body).toString();
           const {name} = JSON.parse(body);
+          response.statusCode = 200
           response.end(`<h1>Halo, ${name}! Ini adalah halaman about</h1>`);
         })
       }
       
     
       else {
+        response.statusCode = 400
         response.end(
           `<h1>halaman tidak dapat diakses menggunakan method ${method} request</h1>`
       );
     }
   } else {
+    response.statusCode = 400
     response.end("<h1>halaman tidak ditemukan!</h1>");
   }
 
